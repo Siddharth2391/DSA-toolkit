@@ -45,5 +45,4 @@ function validate(){
                 Valid Parenthesis
             </div>`
     }
-    console.log(stack);
 }
