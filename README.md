@@ -3,5 +3,6 @@ This website will help you to Solve different DSA problems. Traversal , Expressi
 
 # Output
 
+![alt text](https://github.com/Siddharth2391/DSA-toolkit/blob/main/res/s3.png?raw=true)
 ![alt text](https://github.com/Siddharth2391/DSA-toolkit/blob/main/res/s1.png?raw=true)
 ![alt text](https://github.com/Siddharth2391/DSA-toolkit/blob/main/res/s2.png?raw=true)
