@@ -1,130 +1,121 @@
-function pre(c){
-    if(c=='^'){
+//Basic Utilites
+function prec(c) {
+    if(c == '^')
         return 3;
-    }
-    if(c=='*' || c=='/'){
+    else if(c == '/' || c=='*')
         return 2;
-    }
-    if(c=='+' || c=='-'){
+    else if(c == '+' || c == '-')
         return 1;
-    }
-    return 0;
-}
-function charIsLetter(char) {
-    if (typeof char !== 'string') {
-      return false;
-    }
-    return /^[a-zA-Z]+$/.test(char);
-  }
-
-function inToPost(){
-    try{
-    var stack=[];
-    var post="";
-    var str=document.getElementById('con_exp').value;
-    for(let i=-0;i<str.length;i++){
-            var c=str.charAt(i);
-            if(charIsLetter(c)){
-                post+=c;
-            }else if(c==')' && stack.length==0){
-                document.getElementById('post').value="Invalid";
-                document.getElementById('pre').value="Invalid";
-                break;
-            }else{
-                if(c=='('){
-                    stack.push(c);
-                }else if(c==')'){
-                    var p=stack[stack.length-1];
-                     while(p!='('){
-                         post+=stack.pop();
-                     }   
-                     stack.pop();
-                }else if(c=='+' || c=='/' || c=='*' || c=='-'){
-                    if(stack.length==0){
-                        stack.push(c); 
-                    }else{
-                        var p=stack[stack.length-1];
-                        if(pre(p)<pre(c)){
-                            stack.push(c);
-                        }else if(pre(p)>=pre(c)){
-                                post+=stack.pop();
-                                stack.push(c);
-                        }
-                    }
-                    
-                }
-            }
-        }
-
-        while(!stack.length==0){
-            post+=stack.pop();
-        }
-        document.getElementById('post').value=post;
-    }catch(err){
-        console.log(err);
-    }
-    
+    else
+        return -1;
 }
 
-function inToPre(){
-    try{
-    var str=document.getElementById('con_exp').value;
-    var stack=[];
-    var post="";
-    var rev="";
-    for (let i = str.length-1; i >= 0; i--) {
-        var ch=str.charAt(i);
-        if(ch=='('){
-            rev+=')';
-        }else if(ch==')'){
-            rev+='(';
-        }else{
-            rev+=str.charAt(i);
-        }
-    }
-    console.log(rev);
+function isOperator(c){
+    return (!(c >= 'a' && c <= 'z') &&
+            !(c >= '0' && c <= '9') &&
+            !(c >= 'A' && c <= 'Z'));
+}
 
-    for(let i=-0;i<rev.length;i++){
-            var c=rev.charAt(i);
-            if(charIsLetter(c)){
-                post+=c;
-            }else if(c==')' && stack.length==0){
-                /* document.getElementById('post').value="Invalid"; */
-                document.getElementById('pre').value="Invalid";
-                break;
-            }else{
-                if(c=='('){
-                    stack.push(c);
-                }else if(c==')'){
-                    var p=stack[stack.length-1];
-                     while(p!='('){
-                         post+=stack.pop();
-                     }   
-                     stack.pop();
-                }else if(c=='+' || c=='/' || c=='*' || c=='-'){
-                    if(stack.length==0){
-                        stack.push(c); 
-                    }else{
-                        var p=stack[stack.length-1];
-                        if(pre(p)<pre(c)){
-                            stack.push(c);
-                        }else if(pre(p)>=pre(c)){
-                                post+=stack.pop();
-                                stack.push(c);
-                        }
-                    }
-                    
-                }
+//------------------------------------------------------------------------------------------------------------------------------------
+
+//Infix to Postfix
+function inToPost() {
+    var s=document.getElementById('con_exp').value;
+    let st = []; 
+    let result = "";
+
+    for(let i = 0; i < s.length; i++) {
+        let c = s[i];
+
+        if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+            result += c;
+        else if(c == '(')
+            st.push('(');
+        else if(c == ')') {
+            while(st[st.length - 1] != '(')
+            {
+                result += st[st.length - 1];
+                st.pop();
             }
+            st.pop();
         }
-
-        while(!stack.length==0){
-            post+=stack.pop();
+        else {
+            while(st.length != 0 && prec(s[i]) <= prec(st[st.length - 1])) {
+                result += st[st.length - 1];
+                st.pop(); 
+            }
+            st.push(c);
         }
-        document.getElementById('pre').value=post;
-    }catch(err){
-        console.log(err);
     }
+    while(st.length != 0) {
+        result += st[st.length - 1];
+        st.pop();
+    }
+    document.getElementById('post').value=result;
+}
+//Infix to Prefix
+function inToPre()
+{
+    var infix=document.getElementById('con_exp').value;
+    let operators = [];
+    let operands = [];
+  
+    for (let i = 0; i < infix.length; i++)
+    {
+        if (infix[i] == '(')
+        {
+            operators.push(infix[i]);
+        }
+        else if (infix[i] == ')')
+        {
+            while (operators.length!=0 &&
+                operators[operators.length-1] != '(')
+                {
+                let op1 = operands.pop();
+                let op2 = operands.pop();
+                let op = operators.pop();
+                let tmp = op + op2 + op1;
+                operands.push(tmp);
+            }
+            operators.pop();
+        }
+        else if (!isOperator(infix[i]))
+        {
+            operands.push(infix[i] + "");
+        }
+        else
+        {
+            while (operators.length &&
+               prec(infix[i]) <=
+                   prec(operators[operators.length-1]))
+                {
+  
+                let op1 = operands.pop();
+                 
+  
+                let op2 = operands.pop();
+                 
+  
+                let op = operators.pop();
+                 
+  
+                let tmp = op + op2 + op1;
+                operands.push(tmp);
+            }
+  
+            operators.push(infix[i]);
+        }
+    }
+  
+    while (operators.length!=0)
+    {
+        let op1 = operands.pop();
+        let op2 = operands.pop();
+        let op = operators.pop();
+        let tmp = op + op2 + op1;
+        operands.push(tmp);
+    }
+    document.getElementById('pre').value=operands[operands.length-1];
 }
 
 //Validating expression
@@ -165,7 +156,66 @@ function validate(){
     }
 }
 
+function isdigit(c){
+    return c >= '0' && c <= '999';
+}
+
+function evalue(){
+        var exp=document.getElementById('expvalue').value; 
+            let stack = [];
+
+        for (let i = 0; i <exp.length; i++)
+        {
+            let c = exp[i];
+ 
+            if (c == ' ')
+            {
+                continue;
+            }
+            else if (c >= '0' && c <= '9')
+            {
+                let n = 0;
+
+                while (c >= '0' && c <= '9')
+                {
+                    n = n * 10 + (c - '0');
+                    i++;
+                    c = exp[i];
+                }
+                i--;
+                stack.push(n);
+            }
+            else
+            {
+                let val1 = stack.pop();
+                let val2 = stack.pop();
+ 
+                switch (c)
+                {
+                    case '+':
+                    stack.push(val2 + val1);
+                    break;
+ 
+                    case '-':
+                    stack.push(val2 - val1);
+                    break;
+ 
+                    case '/':
+                    stack.push(parseInt(val2 / val1, 10));
+                    break;
+ 
+                    case '*':
+                    stack.push(val2 * val1);
+                    break;
+                }
+            }
+        document.getElementById('eval').value=stack.pop();
+        }
+}
+
+
 //Resetting elements
 function reset() {
     location.reload();
 }
+
